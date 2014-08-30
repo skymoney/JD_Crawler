@@ -27,5 +27,5 @@ ITEM_PIPELINES = [
 HOST = 'localhost'
 PORT = 3306
 USER = 'root'
-PWD = ''
+PWD = '123456'
 DB = 'jd_site'

@@ -25,8 +25,7 @@ class Category(BaseSpider):
 		hxs = HtmlXPathSelector(response)
 		all_ava_cates = hxs.select("//div[@id='allsort']//a/@href").re(r'list\.jd\.com/.*\.html')
 		
-		for cate in all_ava_cates:
-			print cate
+		for cate in all_ava_cates[:2]:
 			yield Request('http://' + cate, callback=self.category_parse)
 
 	def category_parse(self, response):

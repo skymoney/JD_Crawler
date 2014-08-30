@@ -17,6 +17,7 @@ class JdCrawlerPipeline(object):
         self.mysql_con.select_db(settings.DB)
         self.mysql_con.set_character_set('UTF8')
         self.cur = self.mysql_con.cursor()
+        
 
     def process_item(self, item, spider):
         '''
@@ -37,7 +38,7 @@ class JdCrawlerPipeline(object):
         	item_file.write(item['product_wrap'] + '\n')
         #return item
         '''
-
+        
         #write data to mysql
         to_sql = "insert into product_basic(sku, name, img, price) " +\
             "values('%s', '%s', '%s', '%s')"%(item['sku'], item['name'].encode('utf-8'), \

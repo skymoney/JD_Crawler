@@ -25,45 +25,44 @@ class JD_Product_Spider(BaseSpider):
 	price_url = 'http://p.3.cn/prices/get?skuid=J_'
 	
 	def parse(self, response):
-		hxs = HtmlXPathSelector(response)
-
+		hxs = response.selector
 		jd = Jd_Product()
 
 		jd['sku'] = re.search(r'\d+', str(response.url)).group()
 
-		jd['name'] = hxs.select("//div[@id='name']/h1/text()").extract()[0]
+		jd['name'] = hxs.xpath("//div[@id='name']/h1/text()").extract()[0]
 
 		jd['price'] = eval(requests.get(self.price_url + jd['sku']).content)[0]['p']
-		jd['img'] = hxs.select("//div[@id='spec-n1']/img/@src").extract()[0]
+		jd['img'] = hxs.xpath("//div[@id='spec-n1']/img/@src").extract()[0]
 
-		seller_detail_list = hxs.select("//ul[@class='detail-list']/li")
+		seller_detail_list = hxs.xpath("//ul[@class='detail-list']/li")
 		jd['sell_detail'] = []
 		for li in seller_detail_list:
-			if li.select('./a'):
+			if li.xpath('./a'):
 				jd['sell_detail'].append(li.select('./text()').extract()[0].encode('utf-8') +\
 					li.select('./a/text()').extract()[0].encode('utf-8'))
 			else:
 				jd['sell_detail'].append(li.select('./text()').extract()[0].encode('utf-8'))
 
 		#crawl product info
-		product_detail_trs = hxs.select("//div[@id='product-detail-2']/table/tr")
+		product_detail_trs = hxs.xpath("//div[@id='product-detail-2']/table/tr")
 
 		product_detail_info = {}
 		current_tag = 'default'
 		for single_tr in product_detail_trs:
-			if single_tr.select('./th').extract():				
-				product_detail_info[single_tr.select('./th/text()').extract()[0].encode('utf-8')] \
+			if single_tr.xpath('./th').extract():				
+				product_detail_info[single_tr.xpath('./th/text()').extract()[0].encode('utf-8')] \
 					= {}
 				current_tag = single_tr.select('./th/text()').extract()[0].encode('utf-8')
-			if single_tr.select('./td').extract():
-				info = single_tr.select('./td/text()').extract()
+			if single_tr.xpath('./td').extract():
+				info = single_tr.xpath('./td/text()').extract()
 				try:
 					product_detail_info[current_tag][info[0].encode('utf-8')] = info[1].encode('utf-8')
 				except:
 					product_detail_info[current_tag][info[0].encode('utf-8')] = ''
 		jd['product_detail'] = product_detail_info
 		
-		product_content_ele = hxs.select("//div[@id='product-detail-3']/duv/text()")
+		product_content_ele = hxs.xpath("//div[@id='product-detail-3']/duv/text()")
 
 		if product_content_ele:
 			jd['product_wrap'] = product_content_ele.extract()[0].encode('utf-8')

@@ -27,4 +27,16 @@ class Jd_Product(Item):
 class Jd_Review(Item):
 	sku = Field()
 
-	review = Field()
+	user_name = Field()
+	user_page = Field()
+	user_level = Field()
+	user_address = Field()
+
+	star = Field()
+	comment_date = Field()
+
+	tags = Field()
+	content = Field()
+	buy_date = Field()
+
+	useful = Field()

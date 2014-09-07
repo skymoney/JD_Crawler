@@ -7,6 +7,8 @@
 import MySQLdb
 import settings
 
+from jd_crawler.items import Jd_Review, Jd_Product
+
 class JdCrawlerPipeline(object):
     def __init__(self):
         pass       
@@ -40,14 +42,28 @@ class JdCrawlerPipeline(object):
         '''
         
         #write data to mysql
-        to_sql = "insert into product_basic(sku, name, img, price) " +\
-            "values('%s', '%s', '%s', '%s')"%(item['sku'], item['name'].encode('utf-8'), \
-                item['img'].encode('utf-8'), item['price'])
-        try:
-            self.cur.execute(to_sql)
-            self.mysql_con.commit()
-        except:
-            print 'sql error'
+        if isinstance(item, Jd_Product):
+            to_sql = "insert into product_basic(sku, name, img, price) " +\
+                "values('%s', '%s', '%s', '%s')"%(item['sku'], item['name'].encode('utf-8'), \
+                    item['img'].encode('utf-8'), item['price'])
+            try:
+                self.cur.execute(to_sql)
+                self.mysql_con.commit()
+            except:
+                print 'sql error'
+
+        if isinstance(item, Jd_Review):
+            #print item['content']
+            with open('review.dat', 'ab') as review_file:
+                review_file.write('Name: ' + item['user_name'] + '\n')
+                review_file.write('Page: ' + item['user_page'] + '\n')
+                review_file.write('Level & Location: ' + item['user_level'] + ' @ ' + item['user_address'] + '\n')
+                review_file.write('Star: ' + item['star'] + ' @ ' + item['comment_date'] + '\n')
+                review_file.write('Tags: ' + ' '.join(item['tags']) + '\n')
+                review_file.write('Content: ' + item['content'] + '\n')
+                review_file.write('Buy Date: ' + item['buy_date'] + '\n')
+                review_file.write('Useful: ' + item['useful'] + '\n')
+                review_file.write('++++++++++++++++++++++++++++++++\n')
 
     def close_spider(self, spider):
         self.cur.close()
